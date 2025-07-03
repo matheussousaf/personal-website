@@ -4,12 +4,14 @@ import { ArrowLeft } from "lucide-react";
 import { PostContent } from "@/components/blog/post-content";
 import { ActionsPostButton } from "@/components/blog/actions-post-button";
 
-export default async function PostPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const { slug } = await params;
+interface PostPageParams {
+  params: {
+    slug: string;
+  };
+}
+
+export default async function PostPage({ params }: PostPageParams) {
+  const { slug } = params;
   const post = getPostBySlug(slug);
 
   return (
@@ -51,10 +53,7 @@ export default async function PostPage({
 
         <nav className="mt-16 pt-8 border-t border-gray-800">
           <div className="flex justify-between items-center">
-            <ActionsPostButton
-              direction="previous"
-              post={post.previous}
-            />
+            <ActionsPostButton direction="previous" post={post.previous} />
 
             <ActionsPostButton direction="next" post={post.next} />
           </div>
