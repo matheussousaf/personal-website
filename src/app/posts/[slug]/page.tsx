@@ -2,21 +2,17 @@ import { getAllPosts, getPostBySlug, Post } from "@/lib/posts";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PostContent } from "@/components/blog/post-content";
-import { ActionsPostButton } from "@/components/blog/actions-post-button";
+import { ActionsPostButton } from "@/components/blog/posts/actions-post-button";
+import { use } from "react";
+import { ReadingSettingsProvider } from "@/contexts/reading-settings-context";
 
-interface PostPageParams {
-  params: {
-    slug: string;
-  };
-}
-
-export default async function PostPage({ params }: PostPageParams) {
-  const { slug } = params;
+export default function Page(props: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(props.params);
   const post = getPostBySlug(slug);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <div className="max-w-2xl mx-auto px-6 py-16">
+      <ReadingSettingsProvider>
         {/* Back Navigation */}
         <div className="mb-8">
           <Link
@@ -54,11 +50,10 @@ export default async function PostPage({ params }: PostPageParams) {
         <nav className="mt-16 pt-8 border-t border-gray-800">
           <div className="flex justify-between items-center">
             <ActionsPostButton direction="previous" post={post.previous} />
-
             <ActionsPostButton direction="next" post={post.next} />
           </div>
         </nav>
-      </div>
+      </ReadingSettingsProvider>
     </div>
   );
 }

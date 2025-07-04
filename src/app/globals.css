@@ -1,10 +1,21 @@
 @import "tailwindcss";
 
+@layer components {
+  .tweet-full {
+    --tweet-max-width: 100%;
+  }
+}
+
 @layer base {
   /*
    * Define CSS variables for the dark theme (default).
    * These are applied by default.
    */
+
+  .react-tweet-theme {
+    --tweet-max-width: 100%;
+  }
+
   :root {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;

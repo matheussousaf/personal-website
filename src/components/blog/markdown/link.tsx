@@ -22,7 +22,7 @@ export function MarkdownLink({ node, children }: MarkdownLinkProps) {
 
   if (children === "TWEET" && match) {
     return (
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-4 max-w-full flex justify-center items-center gap-2">
         <Tweet id={match[1]} data-theme="dark" />
       </div>
     );
