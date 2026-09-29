@@ -212,6 +212,7 @@ export function NotebookShell({ views, initialView = "index" }: { views: Views; 
     };
   }, [view.key, zenActive]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: View and layout changes must cancel docking motion and restore focus.
   useLayoutEffect(() => {
     const toggle = readingToggleRef.current;
     if (restoreToggleFocus.current) {
@@ -411,6 +412,7 @@ export function NotebookShell({ views, initialView = "index" }: { views: Views; 
 
   return (
     <div ref={shellRef} className={zenActive ? `${styles.shell} ${styles.zen}` : styles.shell} data-reading-docked={isReadingView(view.key) && readingDocked || undefined}>
+      {/* biome-ignore lint/a11y/useValidAnchor: This is a skip link to #main; the handler also moves keyboard focus without changing the view hash. */}
       <a href="#main" className={styles.skipLink} onClick={skipToContent}>
         skip to content
       </a>

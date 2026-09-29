@@ -34,7 +34,8 @@ export type AnimatedIconKind = "zen" | "email" | "github" | "twitter" | "linkedi
 
 let motionPreference: MediaQueryList | undefined;
 function getMotionPreference() {
-  return motionPreference ??= window.matchMedia("(prefers-reduced-motion: reduce)");
+  motionPreference ??= window.matchMedia("(prefers-reduced-motion: reduce)");
+  return motionPreference;
 }
 function subscribeToMotionPreference(onChange: () => void) {
   const query = getMotionPreference();

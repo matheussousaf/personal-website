@@ -118,12 +118,14 @@ function Chat({ chat, latestPost, children }: { chat: AgentChat; latestPost?: La
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const canSend = !pending && draft.trim().length > 0;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: These state changes alter the scrollable DOM, not the ref identity.
   useLayoutEffect(() => {
     const log = logRef.current;
     if (!log) return;
     log.scrollTo({ top: log.scrollHeight, behavior: "instant" });
   }, [messages.length, pending, open]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: The controlled draft changes the textarea's measured height.
   useLayoutEffect(() => {
     const input = inputRef.current;
     if (!input) return;
@@ -177,6 +179,7 @@ function Chat({ chat, latestPost, children }: { chat: AgentChat; latestPost?: La
       )}
 
       {open && (
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: The scrollable conversation must be reachable for keyboard scrolling.
         <div ref={logRef} className={styles.log} role="log" aria-label="conversation with my agent" tabIndex={0}>
           {messages.map((message) => (
             <div key={message.id} className={styles.message} data-author={message.author}>
@@ -184,6 +187,7 @@ function Chat({ chat, latestPost, children }: { chat: AgentChat; latestPost?: La
               <div className={styles.bubble}>
                 <p className={styles.text}>
                   {message.parts.map((part, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: Parts are immutable within a message and never reordered.
                     <Fragment key={index}>
                       {typeof part === "string" ? part : <a href={part.href} className={styles.link} {...(part.href.startsWith("https:") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{part.text}</a>}
                     </Fragment>

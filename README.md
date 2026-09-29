@@ -4,14 +4,14 @@ A minimal personal notebook built with Next.js App Router: a persistent identity
 
 ## Getting Started
 
-Install the pinned dependencies and start the development server:
+Use Node.js 20.9 or newer (verified with Node.js 24.5.0) and pnpm 10.14.0, pinned in `package.json`. Install the locked dependencies and start the development server:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Use `pnpm-lock.yaml` for reproducible installs; the legacy npm lockfile is not in sync with the dependencies.
+Use `pnpm-lock.yaml` for reproducible installs; pnpm is the only supported package manager for this repository. All dependencies are public npm packages. If a machine-wide private registry returns an authentication error, use `npm_config_registry=https://registry.npmjs.org pnpm install --frozen-lockfile`.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
@@ -69,7 +69,7 @@ The type scale uses 13–14px supporting labels, 15–17px navigation and body t
 
 Routes are statically prerendered. View content is prepared on the server; only the active view is mounted in the browser. The layout experiments, comparison controls, and superseded page components have been removed.
 
-Tweet-rendering code loads only when an article view is mounted. Embeds normalize omitted entity arrays, including quoted tweets, before passing data to `react-tweet`. An unavailable tweet displays the library's not-found state rather than preventing the article from loading.
+Tweet-rendering code loads only when an article view is mounted. `react-tweet` handles omitted entity objects and arrays, including quoted tweets. The adapter copies display-text ranges before rendering because enrichment mutates them; cached tweet data stays intact. An unavailable tweet displays the library's not-found state rather than preventing the article from loading.
 
 ## Production preview
 
@@ -77,6 +77,24 @@ Tweet-rendering code loads only when an article view is mounted. Embeds normaliz
 pnpm build
 pnpm start
 ```
+
+## Dependency maintenance and verification
+
+Dependencies use current stable releases, including Next.js 16.3.7, React 19.3.0, TypeScript 7.0.2, Tailwind CSS 4.3.3, Biome 2.5.14, and Lucide 1.48.0. Next.js 16 uses Turbopack for both development and production builds. Its development server generates `AGENTS.md` and `CLAUDE.md` to point assistants to the installed framework documentation.
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm build
+pnpm audit
+pnpm outdated
+```
+
+`lint` runs Biome rather than the removed `next lint` command. Its configuration recognizes Tailwind directives and CSS Modules; narrowly documented exceptions preserve intentional effect dependencies, keyboard scrolling, immutable message keys, and skip-link behavior. The current code has eight non-blocking lint warnings and one informational diagnostic.
+
+There is no automated test suite configured. Runtime smoke checks cover the production routes and unknown-post 404, static assets and image optimization, desktop/mobile navigation, browser history and fragment reloads, read mode, chat replies/resume/reset, and tweet rendering with missing entities. External tweets may be unavailable independently of the application; check that their not-found state does not break the article.
+
+Known framework diagnostic: under `next start`, Next.js 16.3.7 logs `Internal: NoFallbackError` for an unknown `/posts/[slug]` with `dynamicParams = false`. The response is still the expected HTTP 404 and not-found page. Keep the static-route constraint rather than suppressing the log or enabling request-time rendering solely to avoid it.
 
 ## Learn More
 
