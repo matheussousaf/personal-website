@@ -1,71 +1,43 @@
-import { getAllPosts, getPostBySlug, Post } from "@/lib/posts";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { PostContent } from "@/components/blog/post-content";
-import { ActionsPostButton } from "@/components/blog/posts/actions-post-button";
-import { use } from "react";
-import { ReadingSettingsProvider } from "@/contexts/reading-settings-context";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { toIsoDate } from "@/components/blog/posts/post-date";
+import { Notebook } from "@/components/site/notebook";
+import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import { getDescription } from "@/utils/getDescription";
 
-export default function Page(props: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(props.params);
-  const post = getPostBySlug(slug);
+type Props = { params: Promise<{ slug: string }> };
 
-  return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <ReadingSettingsProvider>
-        {/* Back Navigation */}
-        <div className="mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            back to home
-          </Link>
-        </div>
+// Only slugs from content/posts exist; anything else is a static 404.
+export const dynamicParams = false;
 
-        <header className="mb-12">
-          <h1 className="text-3xl font-medium text-white mb-4 leading-tight">
-            {post.title}
-          </h1>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <time dateTime={post.date}>
-              {new Date(post.date).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-            <span>•</span>
-            <span>{post.readingTime}</span>
-          </div>
-        </header>
-
-        <article className="prose prose-invert prose-gray max-w-none">
-          <div className="text-gray-200 leading-relaxed space-y-6">
-            <PostContent content={post.content} />
-          </div>
-        </article>
-
-        <nav className="mt-16 pt-8 border-t border-gray-800">
-          <div className="flex justify-between items-center">
-            <ActionsPostButton direction="previous" post={post.previous} />
-            <ActionsPostButton direction="next" post={post.next} />
-          </div>
-        </nav>
-      </ReadingSettingsProvider>
-    </div>
-  );
+export function generateStaticParams() {
+  return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
-export async function generateStaticParams() {
-  const posts = getAllPosts();
+// Guard at the route boundary so an unknown slug never reaches the fs read.
+function findPost(slug: string) {
+  if (!getAllPosts().some((post) => post.slug === slug)) notFound();
+  return getPostBySlug(slug);
+}
 
-  return posts.map((post: Post) => ({
-    slug: post.slug,
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = findPost((await params).slug);
+  const description = getDescription(post.content, 160);
+
+  return {
     title: post.title,
-    date: post.date,
-    readingTime: post.readingTime,
-    content: post.content,
-  }));
+    description,
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description,
+      publishedTime: toIsoDate(post.date),
+      tags: post.tags,
+    },
+  };
+}
+
+export default async function Page({ params }: Props) {
+  const post = findPost((await params).slug);
+  return <Notebook initialView={`post-${post.slug}`} />;
 }

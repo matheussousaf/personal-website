@@ -25,7 +25,7 @@ export function MarkdownImage({ node }: MarkdownImageProps) {
         fill
         sizes="100vw"
         unoptimized
-        className="object-contain rounded-lg"
+        className="object-contain"
       />
     </div>
   );

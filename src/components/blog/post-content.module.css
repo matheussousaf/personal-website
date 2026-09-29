@@ -1,0 +1,257 @@
+/* Reading hooks: the notebook shell's read mode overrides these custom properties. */
+.prose {
+  font-size: var(--prose-size, 17px);
+  line-height: var(--prose-leading, 1.9);
+  color: var(--site-text);
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+/* Flow rhythm: every block is spaced by its predecessor, never by itself. */
+.prose > * {
+  margin-block: 0;
+}
+
+.prose > * + * {
+  margin-top: 1.35em;
+}
+
+.prose > :first-child {
+  color: var(--site-fg);
+}
+
+/* Headings */
+.prose > h2,
+.prose > h3,
+.prose > h4 {
+  scroll-margin-top: 2rem;
+  font-weight: var(--prose-heading-weight, 400);
+  color: var(--site-fg);
+  text-wrap: balance;
+}
+
+.prose > h2 {
+  font-size: var(--prose-h2-size, 1.375rem);
+  line-height: var(--prose-heading-leading, 1.5);
+  letter-spacing: -0.02em;
+}
+
+.prose > h3 {
+  font-size: var(--prose-h3-size, 1.25rem);
+  line-height: var(--prose-heading-leading, 1.5);
+  letter-spacing: -0.02em;
+}
+
+.prose > h4 {
+  font-size: var(--prose-h4-size, 1.1875rem);
+  line-height: var(--prose-heading-leading, 1.5);
+  letter-spacing: -0.01em;
+}
+
+.prose > * + :is(h2, h3, h4) {
+  margin-top: 2.4em;
+}
+
+.prose > :is(h2, h3, h4) + * {
+  margin-top: 0.75em;
+}
+
+/* Inline */
+.prose a {
+  color: var(--site-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--site-rule-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition:
+    color 150ms ease,
+    text-decoration-color 150ms ease;
+}
+
+.prose a:hover {
+  text-decoration-color: currentColor;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--site-fg);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose :not(pre) > code {
+  padding: 0.12em 0.36em;
+  border: 1px solid var(--site-rule);
+  border-radius: 2px;
+  background: var(--site-raised);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--site-fg);
+}
+
+/* Lists */
+.prose ul,
+.prose ol {
+  padding-left: 1.35em;
+}
+
+.prose ul {
+  list-style: disc;
+}
+
+.prose ol {
+  list-style: decimal;
+}
+
+.prose li {
+  padding-left: 0.35em;
+}
+
+.prose li + li,
+.prose li > :is(ul, ol) {
+  margin-top: 0.5em;
+}
+
+.prose ul > li::marker {
+  color: var(--site-muted);
+}
+
+.prose ol > li::marker {
+  font-family: var(--font-sans);
+  font-size: 0.85em;
+  color: var(--site-muted);
+}
+
+.prose li > p + p {
+  margin-top: 0.75em;
+}
+
+/* Quotes */
+.prose blockquote {
+  padding-left: 1.25em;
+  border-left: 2px solid var(--site-fg);
+  color: var(--site-fg);
+  font-size: 1.125em;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+
+.prose blockquote > * + * {
+  margin-top: 0.75em;
+}
+
+.prose > * + blockquote,
+.prose > blockquote + * {
+  margin-top: 1.75em;
+}
+
+/* Section breaks */
+.prose hr {
+  height: 1px;
+  border: 0;
+  background: var(--site-rule);
+}
+
+.prose > * + hr,
+.prose > hr + * {
+  margin-top: 2.75em;
+}
+
+/* Code blocks */
+.prose pre {
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--site-rule);
+  border-radius: 2px;
+  background: var(--site-sunk);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--site-fg);
+}
+
+/* Tables (GFM) scroll inside the column instead of widening the page. */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 1.0625rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose th,
+.prose td {
+  padding: 0.6em 1em 0.6em 0;
+  border-bottom: 1px solid var(--site-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-weight: 600;
+  color: var(--site-fg);
+}
+
+/* Media */
+.figure {
+  overflow: hidden;
+  margin-inline: 0;
+  border: 1px solid var(--site-rule);
+  background: var(--site-sunk);
+}
+
+.prose > * + .figure,
+.prose > .figure + *,
+.prose > * + [data-theme],
+.prose > [data-theme] + * {
+  margin-top: 2.25em;
+}
+
+/* Embedded posts share the site palette. Two-class specificity outranks
+   react-tweet's own `[data-theme] .react-tweet-theme` defaults. */
+.prose :global(.react-tweet-theme) {
+  --tweet-max-width: 100%;
+  --tweet-container-margin: 0;
+  --tweet-font-family: var(--font-sans);
+  --tweet-body-font-size: 17px;
+  --tweet-body-line-height: 1.7;
+  --tweet-header-font-size: 17px;
+  --tweet-header-line-height: 22px;
+  --tweet-quoted-body-font-size: 17px;
+  --tweet-quoted-body-line-height: 22px;
+  --tweet-info-font-size: 17px;
+  --tweet-info-line-height: 22px;
+  --tweet-actions-font-size: 16px;
+  --tweet-actions-line-height: 18px;
+  --tweet-replies-font-size: 16px;
+  --tweet-replies-line-height: 18px;
+  --tweet-bg-color: var(--site-raised);
+  --tweet-bg-color-hover: var(--site-raised);
+  --tweet-quoted-bg-color-hover: var(--site-sunk);
+  --tweet-border: 1px solid var(--site-rule);
+  --tweet-font-color: var(--site-fg);
+  --tweet-font-color-secondary: var(--site-muted);
+  /* Links and mentions stay neutral; react-tweet would otherwise paint them blue. */
+  --tweet-color-blue-primary: var(--site-fg);
+  --tweet-color-blue-primary-hover: #ffffff;
+  --tweet-color-blue-secondary: var(--site-fg);
+  --tweet-color-blue-secondary-hover: rgb(255 255 255 / 0.06);
+  --tweet-twitter-icon-color: var(--site-fg);
+  --tweet-skeleton-gradient: linear-gradient(
+    270deg,
+    var(--site-raised),
+    var(--site-sunk),
+    var(--site-sunk),
+    var(--site-raised)
+  );
+  margin-block: 0;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .prose a {
+    transition: none;
+  }
+}

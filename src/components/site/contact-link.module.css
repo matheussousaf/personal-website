@@ -1,0 +1,41 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  max-width: 100%;
+  color: var(--site-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--site-rule-strong);
+  transition: color 140ms ease, text-decoration-color 140ms ease;
+}
+
+.link span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.link:is(:hover, :focus-visible) {
+  color: var(--site-fg);
+  text-decoration-color: currentColor;
+}
+
+.icon {
+  flex: 0 0 auto;
+  opacity: 0.82;
+  transition: opacity 140ms ease;
+}
+
+.link:is(:hover, :focus-visible) .icon {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .link { min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link, .icon { transition: none; }
+}

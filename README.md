@@ -1,24 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Matheus Sousa — personal website
+
+A minimal personal notebook built with Next.js App Router: a persistent identity rail, charcoal palette, lowercase interface copy, readable Geist Sans typography, and a small, visibly chunky pixel-art GitHub avatar.
 
 ## Getting Started
 
-First, run the development server:
+Install the pinned dependencies and start the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install --frozen-lockfile
 pnpm dev
-# or
-bun dev
 ```
+
+Use `pnpm-lock.yaml` for reproducible installs; the legacy npm lockfile is not in sync with the dependencies.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Edit `src/components/site/notebook.tsx` for the views, `src/components/site/profile.ts` for the biography, tools, and contact details, and `content/posts/*.md` for articles.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pages and interface
+
+- The index, biography, writing archive, contact details, and articles open as views inside the same notebook shell. Internal navigation does not reload the document or replace the sidebar.
+- Views have shareable fragment URLs: `/#about`, `/#writing`, `/#contact`, and `/#post-voice-interfaces`. Browser back/forward and reload preserve the selected view.
+- Existing `/about`, `/writing`, and `/posts/[slug]` URLs remain entry points into the corresponding notebook view, with server-rendered content and route metadata. Unknown post slugs return 404.
+- The default desktop notebook is centered within an 848px maximum width, with a sticky identity rail beside the content column. On mobile, identity and navigation sit above the content.
+- `notebook-shell.tsx` handles active views and navigation; `notebook-shell.module.css` handles layout and transitions. Content styles live in `notebook-content.module.css`.
+- Personal copy and navigation favor lowercase; article text and technology names retain their original casing. Keyboard focus moves to the new content, and a skip link bypasses the identity rail.
+- The index and about view share their introduction from `profile.ts`. The profile uses “software engineer” and describes current work with AI, products, and interfaces without a career timeline. About copy, role labels, metadata, and the agent’s biography response stay aligned; the tools list remains on the index rather than the about page.
+
+## Contact and reading modes
+
+Contact opens with four contact links followed by a compact composer as the fifth option. Plain question buttons sit directly below the input, without underlines, pill borders, or backgrounds. There is no chat heading: “talk to my agent” appears only as the input placeholder. The welcome layout follows its content height rather than reserving an empty conversation panel.
+
+The single-line composer is a 37px-high transparent underline with a 24px ghost send button, rather than a boxed field or filled circular control. Its 15px desktop text matches the contact links; touch inputs retain 16px text to avoid automatic focus zoom. Send, back, and new-chat controls use slight 2px corners and restrained hover backgrounds.
+
+Focus brightens the underline over 180ms, without adding a background, outer outline, or shadow. An accepted message triggers one 360ms upward exit-and-return animation on the send arrow, driven by the actual pending state. Global reduced-motion rules disable the transitions and animations.
+
+Sending a message expands the conversation, with compact right-aligned user bubbles and plain left-aligned replies. User bubbles have a thin border and slight 6px corners, without entrance animations. Only the active conversation anchors its composer at the bottom, with message history scrolling above it. History positioning and mobile chat alignment are immediate rather than animated. Replies have no visible author labels or icons; authors remain available to screen readers. A pending reply shows only typing dots. The back control restores the contact options without losing the thread; the new-chat control clears it and cancels any pending reply.
+
+When a thread exists but is not currently displayed, a compact “resume chat” utility appears beneath the normal sidebar navigation; the menu retains its four page links. A short rule and spacing separate it from navigation, without a card or redundant heading. In read mode it becomes a labeled, icon-only chat action in the header, with no extra row or separator. Its reserved slot stays in place when the reading toggle docks beside it. Both versions resume the thread, preserve the draft, and focus the composer. They are hidden while the conversation is active and disappear when a new chat clears the thread.
+
+Only the first message of a new thread requests the contact reveal: outgoing content fades over 90ms, incoming content reveals over 240ms, and the underline composer moves into place over 340ms without remounting its textarea. Back, resume, reset, and sending into an existing thread switch layouts immediately. Contact options, suggestions, the transcript, and existing messages have no separate entrance animations to replay. The notebook and navigation marker are excluded from the first-open transition. Browsers without View Transitions use a 240ms first-open fallback; reduced motion switches immediately. Blank or pending sends do not trigger a layout transition. Resuming from another notebook view retains the normal page-navigation transition, without an additional chat entrance.
+
+Replies are deterministic local mocks in `contact-agent-replies.ts`, not a live LLM integration. No messages are sent over the network or written to storage. `AgentChatProvider` keeps the conversation and draft in memory across notebook views; a full reload starts over. Enter sends, Shift+Enter adds a line, and IME confirmation does not submit.
+
+Contact links use compact filled icons adapted from [Lucide Animated](https://lucide-animated.com), with attribution in `public/licenses/lucide-animated.txt`. Motion’s `LazyMotion`/`m` components animate selected SVG parts into a held hover or keyboard-focus state over 220ms; there are no loops, shakes, or bounces. Reduced-motion preferences disable movement, including when the preference changes while an icon is active.
+
+Writing and article views expose an icon-only, 32px ghost read-mode toggle at the writing column’s top-right edge, opposite “← writing” on articles. Its accessible label, pressed state, and tooltip identify the action without visible text. As that position scrolls behind the header or out of the viewport, the single toggle docks beside the menu; scrolling back returns it to the content column. Each move uses a local 220ms fade-and-settle with a small vertical offset and scale, rather than flying across the page. Focus follows without scrolling. Reversing direction cancels the previous motion, layout transitions do not add another docking animation, and reduced motion skips or immediately cancels it. On narrow screens outside read mode, a compact fixed menu keeps the docked control reachable.
+
+Read mode centers a 704px reading column and puts the identity, four navigation links, and compact action slots into a sticky header. Resume chat and the docked reading toggle share those slots rather than creating another row. Body text grows to 19px (18px on narrow screens). Headings, metadata, back links, archive entries, and paragraphs remain left-aligned; only the overall reading column is centered.
+
+Read mode stays active between the writing list and articles, but resets when leaving those views or reloading. Escape exits unless a text field or dialog owns the key. Toggling preserves the article subtree and reading position, so embedded posts are not remounted.
+
+## Page transitions
+
+Normal view changes animate only the content and the small navigation marker. Native View Transitions fade outgoing content for 80ms, then bring the new content in over 120ms with a 5px rise. The navigation marker moves over 200ms. Separating the fades prevents overlapping text.
+
+Browsers without View Transitions use a short CSS entrance animation. Reduced-motion preferences disable both paths. Navigation uses native fragment history rather than private Next.js router-state access. Page and layout transitions use browser APIs; Motion is confined to SVG icon interactions.
+
+Read-mode toggles fade out two intact regions—the navigation and content—over 90ms, then reveal the new header and reading region with small 4–5px vertical offsets, finishing within 350ms. Separate snapshot names preserve each layout’s natural size and position: individual links and the portrait never travel across the page or stretch between layouts. Navigation is captured only during these layout changes, keeping ordinary tab navigation clickable. Browsers without View Transitions use coordinated header/content entrance animations; reduced-motion preferences make the layout change instant.
+
+## Portrait and performance
+
+`public/images/matheus-dither.png` is a static, 24 × 32, two-color PNG generated from [the GitHub avatar for matheussousaf](https://github.com/matheussousaf.png). It uses a 2 × 2 ordered dither with charcoal `#101010` and off-white `#dedee0`, displayed at 96 × 128 with `image-rendering: pixelated`: each source pixel occupies a 4 × 4 CSS-pixel block. The asset is 214 bytes; there is no runtime canvas or GitHub API request.
+
+Geist Sans is self-hosted in `public/fonts/geist-sans-latin.woff2` (29,400 bytes), with its SIL Open Font License alongside it. The variable font covers weights 400–600, is preloaded once, uses `font-display: swap`, and falls back to system sans-serif fonts. Navigation, articles, and tweet embeds use the sans face; code retains system monospace fonts. No Google Fonts request is made at build time or in the browser. Font declarations and colors live in `src/app/globals.css`.
+
+The type scale uses 13–14px supporting labels, 15–17px navigation and body text, and 19–24px introductions and page headings. Article headings, code, tables, and embedded-post text follow the same enlarged scale.
+
+Routes are statically prerendered. View content is prepared on the server; only the active view is mounted in the browser. The layout experiments, comparison controls, and superseded page components have been removed.
+
+Tweet-rendering code loads only when an article view is mounted. Embeds normalize omitted entity arrays, including quoted tweets, before passing data to `react-tweet`. An unavailable tweet displays the library's not-found state rather than preventing the article from loading.
+
+## Production preview
+
+```bash
+pnpm build
+pnpm start
+```
 
 ## Learn More
 

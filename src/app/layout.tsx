@@ -1,14 +1,18 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
+import type { Metadata, Viewport } from "next"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" })
 
 export const metadata: Metadata = {
-  title: "Matheus Sousa - Full-Stack Developer",
-  description: "Full-stack developer building the future of web",
+  title: {
+    default: "Matheus Sousa — Software Engineer",
+    template: "%s — Matheus Sousa",
+  },
+  description: "Software engineer in Brazil. Working with AI and sharing notes on software, interfaces, and the things I’m building.",
+}
+
+export const viewport: Viewport = {
+  themeColor: "#101010",
 }
 
 export default function RootLayout({
@@ -17,8 +21,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>{children}</body>
+    <html lang="en">
+      <head>
+        <link rel="preload" href="/fonts/geist-sans-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
+      <body>{children}</body>
     </html>
   )
 }

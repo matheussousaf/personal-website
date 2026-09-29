@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { Tweet } from "react-tweet";
+import { LazyTweet } from "../lazy-tweet";
 
 export interface MarkdownLinkProps {
   node: {
@@ -21,11 +19,7 @@ export function MarkdownLink({ node, children }: MarkdownLinkProps) {
   const match = typeof href === "string" && tweetUrlPattern.exec(href);
 
   if (children === "TWEET" && match) {
-    return (
-      <div className="mt-4 max-w-full flex justify-center items-center gap-2">
-        <Tweet id={match[1]} data-theme="dark" />
-      </div>
-    );
+    return <LazyTweet id={match[1]} />;
   }
 
   if (href.startsWith("/") || href.startsWith("#")) {
